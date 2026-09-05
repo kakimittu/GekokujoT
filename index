@@ -1,0 +1,1267 @@
+<title>下剋上図書館</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --ink:#16263c; --ink-2:#42556e; --ink-3:#7d8ca1;
+  --paper:#eef0f2; --panel:#f7f8f9; --panel-2:#e3e7ea;
+  --line:#c3cbd3; --line-soft:#d9dfe4;
+  --ai:#1f4e79;           /* 藍 */
+  --ai-soft:#dbe6f0;
+  --shu:#b8402c;          /* 朱・蔵書印 */
+  --shu-soft:#f2ddd8;
+  --ok:#2f6b4f;
+  --gold:#8a6a1f;
+  --btn-fg:#f7f8f9;
+  --shadow:0 1px 0 rgba(22,38,60,.06), 0 6px 18px rgba(22,38,60,.08);
+  --r:3px;
+  --ndc0:#6b7280;--ndc1:#7a5ea8;--ndc2:#a8783c;--ndc3:#2f7d8a;--ndc4:#3d7a4e;
+  --ndc5:#5b6ea8;--ndc6:#8a7a2f;--ndc7:#a84a72;--ndc8:#4a8a8a;--ndc9:#b8402c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#dde5ee; --ink-2:#a9b8c8; --ink-3:#7b8b9c;
+    --paper:#12181f; --panel:#1a222c; --panel-2:#232d39;
+    --line:#3a4652; --line-soft:#2b3541;
+    --ai:#8fb8dd; --ai-soft:#22303f;
+    --shu:#e08b74; --shu-soft:#3a2622;
+    --ok:#7fbf95; --gold:#d3b264; --btn-fg:#0e1319;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.45);
+    --ndc0:#9aa4b0;--ndc1:#b39ad6;--ndc2:#d4a76a;--ndc3:#63b5c2;--ndc4:#74b98a;
+    --ndc5:#93a5dd;--ndc6:#c2b268;--ndc7:#d98aae;--ndc8:#7fc2c2;--ndc9:#e08b74;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#dde5ee; --ink-2:#a9b8c8; --ink-3:#7b8b9c;
+  --paper:#12181f; --panel:#1a222c; --panel-2:#232d39;
+  --line:#3a4652; --line-soft:#2b3541;
+  --ai:#8fb8dd; --ai-soft:#22303f;
+  --shu:#e08b74; --shu-soft:#3a2622;
+  --ok:#7fbf95; --gold:#d3b264; --btn-fg:#0e1319;
+  --shadow:0 1px 0 rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.45);
+  --ndc0:#9aa4b0;--ndc1:#b39ad6;--ndc2:#d4a76a;--ndc3:#63b5c2;--ndc4:#74b98a;
+  --ndc5:#93a5dd;--ndc6:#c2b268;--ndc7:#d98aae;--ndc8:#7fc2c2;--ndc9:#e08b74;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;
+  font-size:15px;line-height:1.75;
+}
+h1,h2,h3{font-family:"Shippori Mincho","Hiragino Mincho ProN",serif;font-weight:800;text-wrap:balance;margin:0;line-height:1.35}
+.mono{font-family:"Roboto Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+
+.wrap{max-width:880px;margin:0 auto;padding:0 16px 64px}
+
+/* ── 背ラベル風ステータス帯 ── */
+.status{position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1px solid var(--line);}
+.status-in{max-width:880px;margin:0 auto;padding:8px 16px;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+.when{display:flex;align-items:baseline;gap:8px;margin-right:auto}
+.when .yr{font-family:"Shippori Mincho",serif;font-weight:800;font-size:17px}
+.when .rank{font-size:11px;letter-spacing:.14em;color:var(--ink-3);border:1px solid var(--line);border-radius:999px;padding:1px 9px}
+.stat{display:flex;align-items:baseline;gap:5px;font-size:12px;color:var(--ink-3)}
+.stat b{font-family:"Roboto Mono",monospace;font-variant-numeric:tabular-nums;font-size:14px;font-weight:700;color:var(--ink)}
+.ap-dots{display:flex;gap:3px}
+.ap-dots i{width:9px;height:9px;border-radius:50%;background:var(--ai);display:block}
+.ap-dots i.off{background:transparent;border:1px solid var(--line)}
+
+section[hidden]{display:none!important}
+.view{padding-top:26px;animation:in .25s ease both}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.view{animation:none}}
+
+.eyebrow{font-size:11px;letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase;font-family:"Roboto Mono",monospace}
+.panel{background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--r);padding:18px 20px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.muted{color:var(--ink-2);font-size:13.5px}
+
+/* 行動メニュー */
+.acts{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:10px}
+.act{text-align:left;background:var(--panel);border:1px solid var(--line-soft);border-left:3px solid var(--ai);
+  border-radius:var(--r);padding:11px 13px;display:flex;flex-direction:column;gap:3px;transition:transform .12s,border-color .12s}
+.act:hover:not(:disabled){transform:translateX(2px);border-left-color:var(--shu)}
+.act:disabled{opacity:.4;cursor:not-allowed}
+.act .n{font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.act .cost{font-family:"Roboto Mono",monospace;font-size:11px;color:var(--ink-3);border:1px solid var(--line);border-radius:2px;padding:0 5px}
+.act .d{font-size:12px;color:var(--ink-3);line-height:1.5}
+.act.game{border-left-color:var(--shu)}
+.act .tag{font-size:10px;letter-spacing:.1em;color:var(--shu);font-family:"Roboto Mono",monospace}
+
+.btn{background:var(--ai);color:var(--btn-fg);border:none;border-radius:var(--r);padding:10px 22px;font-weight:700;letter-spacing:.04em}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* 書架 */
+.shelves{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:7px}
+.shelf{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:8px 9px;text-align:left;
+  border-top:4px solid var(--sc,var(--ink-3));display:flex;flex-direction:column;gap:1px}
+.shelf .no{font-family:"Roboto Mono",monospace;font-size:15px;font-weight:700}
+.shelf .nm{font-size:11px;color:var(--ink-3)}
+.shelf:hover{background:var(--panel-2)}
+.shelf.sel{background:var(--ai-soft);border-color:var(--ai);box-shadow:inset 0 0 0 1px var(--ai)}
+.shelf.sel .no::after{content:" ✓";color:var(--ai);font-size:12px}
+
+/* 本棚 */
+.case{--wood:#8a7355;background:var(--panel-2);border:7px solid var(--wood);border-radius:4px;overflow:hidden}
+:root[data-theme="dark"] .case,:root:not([data-theme="light"]) .case{--wood:#5b4a38}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .case{--wood:#8a7355}}
+.tier{display:flex;align-items:flex-end;border-bottom:7px solid var(--wood);min-height:190px;padding-left:2px}
+.tier:last-child{border-bottom:none}
+.tier .rng{flex:0 0 clamp(48px,13%,92px);align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:"Roboto Mono",monospace;font-size:clamp(10px,1.3vw,12px);color:var(--ink-2);border-right:1px solid var(--line);
+  background:var(--panel);text-align:center;line-height:1.4}
+.bk{position:relative;flex:1 1 0;min-width:0;max-width:56px;height:170px;border-radius:3px 3px 0 0;background:var(--bc,#5b6ea8);
+  border:none;padding:0;overflow:hidden;box-shadow:inset -3px 0 0 rgba(0,0,0,.16),inset 0 3px 0 rgba(255,255,255,.10)}
+.bk .ttl{position:absolute;top:10px;bottom:44px;left:0;right:0;overflow:hidden}
+.bk .ttl span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  writing-mode:vertical-rl;white-space:nowrap;font-size:14px;line-height:1;color:#fff;
+  letter-spacing:.06em;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.bk .lab{position:absolute;bottom:7px;left:4px;right:4px;background:#fbfbf8;color:#1b2733;border-radius:2px;
+  font-family:"Roboto Mono",monospace;font-size:clamp(8.5px,1.15vw,11px);font-weight:700;line-height:1.3;
+  padding:3px 0;text-align:center;letter-spacing:-.03em;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.bk.odd{cursor:pointer}
+.bk[disabled]{opacity:.22}
+.bk.hit{box-shadow:0 0 0 3px var(--ok)}
+.slot{flex:0 1 22px;min-width:8px;height:170px;background:transparent;border:none;padding:0;position:relative}
+.slot::after{content:"";position:absolute;left:2px;right:2px;top:14px;bottom:14px;border-radius:2px;
+  border:2px dashed var(--line);opacity:.5}
+.slot:hover::after{border-color:var(--ai);border-style:solid;background:var(--ai-soft);opacity:1}
+.case-hint{font-size:12px;color:var(--ink-3);margin-top:8px}
+
+/* 館内図 */
+.plan{width:100%;height:auto;display:block;background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+
+.label-card{display:inline-flex;flex-direction:column;align-items:center;border:1px solid var(--ink-3);border-radius:2px;
+  background:var(--panel);padding:6px 12px;font-family:"Roboto Mono",monospace;line-height:1.3}
+.label-card .a{font-size:19px;font-weight:700}
+.label-card .b{font-size:14px}
+
+.timer{font-family:"Roboto Mono",monospace;font-size:13px;color:var(--shu);font-weight:700}
+.bar{height:4px;background:var(--panel-2);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ai);transition:width .3s linear}
+
+/* 相談 */
+.quote{border-left:3px solid var(--shu);background:var(--shu-soft);padding:12px 16px;border-radius:0 var(--r) var(--r) 0}
+.quote .who{font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-family:"Roboto Mono",monospace}
+.quote p{margin:2px 0 0;font-family:"Shippori Mincho",serif;font-size:17px;line-height:1.6}
+.choices{display:grid;gap:7px}
+.choice{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:9px 13px}
+.choice:hover:not(:disabled){border-color:var(--ai);background:var(--ai-soft)}
+.choice.right{border-color:var(--ok);background:var(--panel)}
+.choice.wrong{border-color:var(--shu);opacity:.7}
+.bkchoice{display:flex;align-items:center;gap:12px}
+.bkchoice .sw{flex:0 0 auto;width:16px;height:32px;border-radius:2px 1px 1px 2px;border:1px solid rgba(0,0,0,.18)}
+.bkchoice .ti{font-weight:500}
+.bkchoice .au{font-size:12px;color:var(--ink-3);margin-left:8px}
+.bkchoice .cn{font-size:11px;color:var(--ink-3);font-family:"Roboto Mono",monospace;margin-left:auto}
+
+/* 間取り */
+.floor{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.cell{aspect-ratio:1.35;border:1px solid var(--line-soft);border-radius:2px;background:var(--panel);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;text-align:center;padding:4px}
+.cell.empty{border-style:dashed;color:var(--ink-3);background:transparent}
+.cell.locked{opacity:.35}
+.cell .ic{font-family:"Roboto Mono",monospace;font-size:15px;font-weight:700;color:var(--ai)}
+
+/* バトル */
+.duel{display:grid;gap:14px}
+.fighter{display:flex;align-items:center;gap:12px;justify-content:space-between;border:1px solid var(--line-soft);
+  background:var(--panel);border-radius:var(--r);padding:11px 14px}
+.hp{display:flex;gap:4px}
+.hp i{width:14px;height:14px;border-radius:2px;background:var(--shu);display:block;transition:background .3s}
+.hp i.gone{background:transparent;border:1px solid var(--line)}
+.gauge{height:6px;background:var(--panel-2);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.gauge i{display:block;height:100%;background:var(--gold);transition:width .3s}
+.say{font-family:"Shippori Mincho",serif;font-size:16px;line-height:1.6;min-height:2.6em}
+.turn-tag{font-family:"Roboto Mono",monospace;font-size:11px;letter-spacing:.16em;padding:2px 10px;border-radius:999px}
+.turn-tag.atk{background:var(--ai-soft);color:var(--ai)}
+.turn-tag.def{background:var(--shu-soft);color:var(--shu)}
+.card{text-align:left;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r);
+  background:var(--panel);padding:9px 12px;display:flex;flex-direction:column;gap:2px}
+.card:hover:not(:disabled){background:var(--panel-2)}
+.card .lv{font-family:"Roboto Mono",monospace;font-size:10px;color:var(--gold);letter-spacing:.1em}
+
+/* 二画面バトル */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.vs{grid-template-columns:1fr}}
+.side{border:1px solid var(--line-soft);border-radius:var(--r);padding:10px 12px;background:var(--panel);border-top:3px solid var(--ai)}
+.side.rival{border-top-color:var(--shu)}
+.sideh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.qrow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:46px;align-content:flex-start}
+.qrow i{width:11px;height:15px;border-radius:4px 4px 1px 1px;background:var(--ai);display:block}
+.qrow i.r{background:var(--shu)}
+.qn{margin-left:6px;font-size:12px;color:var(--ink-3)}
+
+/* カットイン */
+.cutin{position:relative;height:230px;overflow:hidden;border-radius:var(--r);background:#101820;cursor:pointer}
+.cutin .band{position:absolute;inset:-30% -15%;transform:skewX(-12deg) translateX(-125%);
+  background:repeating-linear-gradient(0deg,rgba(184,64,44,.95) 0 26px,rgba(132,38,24,.95) 26px 52px);
+  animation:sweep .55s cubic-bezier(.2,.85,.2,1) forwards}
+@keyframes sweep{to{transform:skewX(-12deg) translateX(0)}}
+.cutin .nm{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;text-align:center;opacity:0;animation:slam .45s .4s cubic-bezier(.2,.9,.3,1) forwards}
+@keyframes slam{from{opacity:0;transform:scale(1.7) rotate(-5deg)}to{opacity:1;transform:none}}
+.cutin .role{font-family:"Roboto Mono",monospace;font-size:12px;letter-spacing:.3em;opacity:.85}
+.cutin .big{font-family:"Shippori Mincho",serif;font-weight:800;font-size:clamp(30px,7vw,48px);letter-spacing:.1em;margin:4px 0 8px}
+.cutin .ln{font-family:"Shippori Mincho",serif;font-size:15px;opacity:.95;padding:0 16px}
+@media (prefers-reduced-motion:reduce){.cutin .band,.cutin .nm{animation:none;transform:none;opacity:1}}
+
+/* 年報 */
+.report{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px}
+.report h2{font-size:22px;letter-spacing:.04em}
+.rule{border:none;border-top:1px solid var(--line);margin:14px 0}
+.figs{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft)}
+.fig{background:var(--panel);padding:9px 11px;display:flex;flex-direction:column}
+.fig .k{font-size:11px;color:var(--ink-3)}
+.fig .v{font-family:"Roboto Mono",monospace;font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.fig .v small{font-size:11px;font-weight:400;color:var(--ink-3);margin-left:2px}
+.chart{width:100%;height:150px;display:block}
+.grade{font-family:"Shippori Mincho",serif;font-size:52px;font-weight:800;color:var(--shu);line-height:1}
+
+.log{font-size:13px;color:var(--ink-2);border-left:2px solid var(--line);padding-left:12px;display:flex;flex-direction:column;gap:4px}
+.log b{color:var(--ink)}
+.note{font-size:12px;color:var(--ink-3)}
+.center{text-align:center}
+.title-hero{padding:46px 0 26px;text-align:center}
+.title-hero h1{font-size:clamp(34px,7vw,54px);letter-spacing:.06em}
+.title-hero .sub{color:var(--ink-2);margin-top:10px}
+.seal{display:inline-block;border:2px solid var(--shu);color:var(--shu);border-radius:3px;padding:5px 10px;
+  font-family:"Shippori Mincho",serif;font-weight:800;letter-spacing:.28em;font-size:13px;transform:rotate(-4deg)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line-soft)}
+th{font-size:11px;color:var(--ink-3);font-weight:500}
+.scrollx{overflow-x:auto}
+</style>
+
+<div class="status" id="status" hidden>
+  <div class="status-in">
+    <div class="when"><span class="yr" id="sWhen">1年目・春</span><span class="rank" id="sRank">新人</span></div>
+    <div class="stat">行動力<span class="ap-dots" id="sAp"></span></div>
+    <div class="stat">予算<b id="sBudget">30,000</b></div>
+    <div class="stat">評判<b id="sRep">20</b></div>
+    <div class="stat">蔵書<b id="sBooks">800</b></div>
+    <div class="stat">整理度<b id="sTidy">100</b></div>
+    <div class="stat">不明本<b id="sUnk">0</b></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- タイトル -->
+<section id="vTitle" class="view">
+  <div class="title-hero">
+    <div class="eyebrow">図書館運営シミュレーション・試作版</div>
+    <h1>下剋上図書館</h1>
+    <p class="sub">新人司書が、先輩を追い越し、主任を追い越し、<br>3年で館長まで上り詰める。</p>
+    <p style="margin-top:18px"><span class="seal">試作 v0.1</span></p>
+  </div>
+  <div class="panel stack">
+    <div>
+      <h3 style="font-size:16px">遊び方</h3>
+      <p class="muted" style="margin:6px 0 0">
+        1ターンは1季節。行動力の範囲で館務を選びます。春に年度の重点目標が下り、
+        冬に<b>蔵書点検</b>と<b>下剋上</b>が待っています。勝てば階級が上がり、使える行動と建てられる部屋が増え、
+        負かした相手は<b>部下</b>になる。3年で館長に届くかどうか。
+      </p>
+    </div>
+    <div class="log">
+      <span><b>配架</b>　背ラベルを見て、2段の棚から正しい隙間を探して差す</span>
+      <span><b>レファレンス</b>　覚え違いの相談から本を突き止める。1回に3件</span>
+      <span><b>蔵書点検</b>　冬。見る棚を選び、並びの乱れを直す。1年のツケの精算</span>
+      <span><b>下剋上</b>　二画面。相手と同時に客をさばき、先に行列を空にした方が勝ち</span>
+    </div>
+    <div class="row"><button class="btn" onclick="startGame()">着任する</button></div>
+  </div>
+</section>
+
+<!-- 年度はじめ -->
+<section id="vBrief" class="view" hidden></section>
+<!-- ターン -->
+<section id="vTurn" class="view" hidden></section>
+<!-- 配架 -->
+<section id="vShelve" class="view" hidden></section>
+<!-- レファレンス -->
+<section id="vRef" class="view" hidden></section>
+<!-- 汎用結果 -->
+<section id="vFlash" class="view" hidden></section>
+<!-- 点検 -->
+<section id="vAudit" class="view" hidden></section>
+<!-- 下剋上 -->
+<section id="vDuel" class="view" hidden></section>
+<!-- 年報 -->
+<section id="vReport" class="view" hidden></section>
+<!-- 建設 -->
+<section id="vBuild" class="view" hidden></section>
+<!-- 終幕 -->
+<section id="vEnd" class="view" hidden></section>
+
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   BALANCE ── 数字はすべてここ。遊びながら直す
+   ══════════════════════════════════════════ */
+const B = {
+  apByRank:[6,7,8,8],
+  grantPerRep:300,
+  shelveBooks:4, shelveTime:50,
+  refPerCounter:3,
+  refRepWin:6, refRepLose:-2,
+  moraleCounter:-12, moraleRest:35, moraleEvent:-18,
+  tidyPerShelve:+9, tidyDecayPerTurn:-7,
+  auditPick:3, auditTime:50,
+  duelHp:5, duelUlt:2,
+  rivalBase:[0,1,2],
+};
+const RANKS=["新人","レファレンス担当","主任","館長"];
+const SEASONS=["春","夏","秋","冬"];
+
+/* ── NDC 10区分 ── */
+const NDC=[
+ {n:0,t:"総記"},{n:1,t:"哲学"},{n:2,t:"歴史"},{n:3,t:"社会科学"},{n:4,t:"自然科学"},
+ {n:5,t:"技術"},{n:6,t:"産業"},{n:7,t:"芸術"},{n:8,t:"言語"},{n:9,t:"文学"}
+];
+/* ── 配架する本（自作データ） ── */
+const BOOKS=[
+ ["走れメロス","913.6","タ"],["銀河鉄道の夜","913.6","ミ"],["吾輩は猫である","913.6","ナ"],
+ ["山椒魚","913.6","イ"],["蜘蛛の糸","913.6","ア"],["注文の多い料理店","913.6","ミ"],
+ ["日本の伝統色","757.3","ヨ"],["写真でみる昭和の大阪","216.3","オ"],["星座早見の使い方","443.8","ホ"],
+ ["雲のかたち観察帳","451.6","ク"],["自由研究のすすめ","375.1","ジ"],["ことばの由来事典","812.0","コ"],
+ ["図書館という場所","010.4","ト"],["やさしい電気のしくみ","540.4","デ"],["市場のしごと","672.1","イ"],
+ ["哲学のはじまり","102.0","テ"],["土と農のはなし","610.4","ツ"],["世界の楽器図鑑","763.0","セ"]
+];
+/* ── 表紙の色 ── */
+const COL={青:"#3f5a8a",紺:"#2c3a5a",緑:"#3f6b52",赤:"#8a3f3f",茶:"#6b5a3a",白:"#ded9cd",黄:"#b39a3f",灰:"#7b8390"};
+/* ── レファレンス問題（型を参考にした自作。ch = 候補：題名・著者・表紙の色） ── */
+const REFS=[
+ {who:"たまきさん",say:"『はしれメロンパン』ってありますかしら",
+  hint:"「お友だちのために走る男の子の話。表紙は<b>赤</b>だったと思うわ」",
+  ans:"走れメロス",kata:"音の崩れ",lv:1,trick:false,
+  ch:[["走れメロス","太宰治","赤"],["はしるメロディ","榎本かおる","青"],["メロンパンのひみつ","西野たけし","黄"],["メロスの休日","太宰治","緑"]]},
+ {who:"ハルくん",say:"『吾輩は犬である』ってどこ？",
+  hint:"「先生の家にいる動物がしゃべるやつ。作者は<b>夏目漱石</b>って書いてあった」",
+  ans:"吾輩は猫である",kata:"意味の反転",lv:1,trick:false,
+  ch:[["吾輩は猫である","夏目漱石","緑"],["吾輩は犬である","川上ひろし","青"],["坊っちゃん","夏目漱石","赤"],["名犬物語","佐々木亮","茶"]]},
+ {who:"久留間さん",say:"『銀河鉄道の夜行バス』を借りたいんですが",
+  hint:"「汽車で天の川を行く話です。<b>宮沢賢治</b>。表紙は<b>紺</b>でした」",
+  ans:"銀河鉄道の夜",kata:"近い言葉",lv:1,trick:false,
+  ch:[["銀河鉄道の夜","宮沢賢治","紺"],["夜行バスの旅","杉本まこと","黄"],["銀河の停留所","宮下れい","青"],["注文の多い料理店","宮沢賢治","茶"]]},
+ {who:"市原先生",say:"『星の少年』、授業で使いたいんです",
+  hint:"「訳が何種類も出ていますね。砂漠で出会う話。表紙は<b>白</b>だったかと」",
+  ans:"星の王子さま",kata:"訳語のズレ",lv:2,trick:false,
+  ch:[["星の王子さま","サン＝テグジュペリ","白"],["星の少年団","藤田ゆう","青"],["少年と星座","大石まもる","紺"],["小さな王子の冒険","サン＝テグジュペリ","黄"]]},
+ {who:"たまきさん",say:"地獄から糸をつたって登っていく話、なんでしたっけ",
+  hint:"「お釈迦さまが上から見ている短いお話。<b>芥川龍之介</b>ね」",
+  ans:"蜘蛛の糸",kata:"内容だけ",lv:2,trick:false,
+  ch:[["蜘蛛の糸","芥川龍之介","白"],["地獄変","芥川龍之介","赤"],["糸電話","中井さとみ","黄"],["くもの巣の科学","新田こうじ","緑"]]},
+ {who:"ハルくん",say:"穴から出られなくなっちゃう生き物の話！",
+  hint:"「両生類だって。二年で大きくなりすぎたんだって。<b>井伏鱒二</b>」",
+  ans:"山椒魚",kata:"内容だけ",lv:2,trick:false,
+  ch:[["山椒魚","井伏鱒二","茶"],["かえるのうた","林ゆたか","緑"],["洞窟の生きもの","浅野かおる","紺"],["もぐらの一日","西田はじめ","黄"]]},
+ {who:"久留間さん",say:"注文がやたら多いレストランの話、ありますよね",
+  hint:"「食べに行ったつもりが、食べられかけるやつです。<b>宮沢賢治</b>」",
+  ans:"注文の多い料理店",kata:"内容だけ",lv:2,trick:false,
+  ch:[["注文の多い料理店","宮沢賢治","茶"],["レストランの経営学","森下たかし","灰"],["西洋料理店の歴史","岡田しずか","赤"],["銀河鉄道の夜","宮沢賢治","紺"]]},
+ {who:"たまきさん",say:"白いクマが出てくる絵本、孫が探してて",
+  hint:"よく聞くと「白くて大きくて、<b>庭にいた</b>」——クマではなく<b>犬</b>らしい",
+  ans:"庭の白い犬",kata:"記憶ちがい",lv:3,trick:true,
+  ch:[["しろくまのぼうけん","北山ひろみ","白"],["庭の白い犬","たかはし・のぶ","白"],["北極のなかまたち","井上けい","青"],["くまさんのおるすばん","小川みどり","黄"]]},
+ {who:"市原先生",say:"宮沢賢三の詩集はどこですか",
+  hint:"著者名が違う。正しくは<b>宮沢賢治</b>——賢三という人の本も棚にあるので紛らわしい",
+  ans:"宮沢賢治詩集",kata:"著者の混線",lv:3,trick:true,
+  ch:[["宮沢賢治詩集","宮沢賢治","紺"],["宮沢賢三作品集","宮沢賢三","緑"],["賢三のうた","宮沢賢三","黄"],["近代詩選","編集部","白"]]},
+ {who:"久留間さん",say:"季節みたいな名前の作家の、青い表紙のやつ",
+  hint:"よく聞くと「表紙は<b>緑</b>だった気もする」——色の記憶があてにならない。作家は<b>秋山冬子</b>",
+  ans:"四季の随筆",kata:"印象だけ",lv:3,trick:true,
+  ch:[["青の断章","木下れん","青"],["四季の随筆","秋山冬子","緑"],["夏の終わりに","秋山冬子","青"],["季節のことば辞典","編集部","白"]]},
+ {who:"ハルくん",say:"トロッコに乗ってどんどん行っちゃう話",
+  hint:"「帰り道が遠くなって泣くんだって。<b>芥川龍之介</b>。表紙は<b>灰</b>っぽい」",
+  ans:"トロッコ",kata:"内容だけ",lv:2,trick:false,
+  ch:[["トロッコ","芥川龍之介","灰"],["線路のむこう","村田さとし","青"],["鉄道少年","川口たかお","赤"],["峠を越えて","芥川龍之介","緑"]]},
+ {who:"たまきさん",say:"『こころ』の、あれ……『からだ』でしたっけ",
+  hint:"「先生と私、という人が出てくるの。<b>夏目漱石</b>よ」",
+  ans:"こころ",kata:"音の崩れ",lv:1,trick:false,
+  ch:[["こころ","夏目漱石","白"],["からだの本","大川ひとし","黄"],["三四郎","夏目漱石","赤"],["門","夏目漱石","緑"]]}
+];
+/* ── 部屋 ── */
+const ROOMS=[
+ {id:"child",n:"児童コーナー",c:18000,rank:1,d:"お話し会が解禁。子どもの相談が増える"},
+ {id:"study",n:"自習室",c:15000,rank:1,d:"来館者が増える"},
+ {id:"sign", n:"書架案内サイン",c:9000,rank:0,d:"配架・点検で棚が見つけやすくなる"},
+ {id:"exhibit",n:"展示コーナー",c:16000,rank:1,d:"POP作りが解禁"},
+ {id:"local",n:"郷土資料室",c:24000,rank:2,d:"難問カードが出やすくなる"},
+ {id:"stack",n:"書庫",c:20000,rank:2,d:"棚の混雑が減り、不明本が出にくい"},
+ {id:"av",   n:"視聴覚コーナー",c:26000,rank:2,d:"評判が伸びやすくなる"},
+ {id:"cafe", n:"喫茶コーナー",c:30000,rank:2,d:"来館者が大きく増える"},
+ {id:"rare", n:"貴重書庫",c:0,rank:3,d:"掘り出し物が並ぶ、自分だけの部屋"}
+];
+/* ── 相手 ── */
+const RIVALS=[
+ {n:"四宮あかね",r:"2年目司書",theme:"speed",
+  says:["新人が私に勝てるわけないでしょ","……ちょっと。今の、なんで分かったの","っ……次、次はもっと難しいの出すから！","……負けた。ちゃんと、負けました"],
+  job:"配架",trickRate:.15},
+ {n:"堂前主任",r:"勤続20年",theme:"accuracy",
+  says:["新しいやり方は、要らんよ","……ほう。そこまで聞き出したか","……わしの分類表が、古いというのか","……その相談、君のほうが向いておる"],
+  job:"レファレンス",trickRate:.4},
+ {n:"鴫原館長",r:"館長",theme:"total",
+  says:["数字を出しなさい。話はそれからだ","ふん。この一年、遊んではおらんかったか","……その本を、どこで見つけた","この図書館は、君のものだ"],
+  job:"—",trickRate:.65}
+];
+/* ── 掘り出し物 ── */
+const TREASURE=[
+ {n:"『郷土のむかし話』",d:"扉に「昭和三十九年　寄贈　中村ミヨ」と鉛筆書き。同じ名字の常連がいる。"},
+ {n:"『四季の草花』",d:"126ページに押し花が挟まっていた。持ち主は返し忘れたのだろうか。"},
+ {n:"『図書館運営の手引き』",d:"貸出カードの最後の欄に、前の館長の名前。日付は開館の年だった。"},
+ {n:"『子どものための天文学』",d:"余白に子どもの字で「土星をみた」。日付は十二年前。"},
+ {n:"『市史　第三巻』",d:"付箋がびっしり。誰かがこの本で、ずっと何かを調べていた。"}
+];
+
+/* ══════════ 状態 ══════════ */
+let S=null;
+function newState(){return{
+  year:1,season:0,ap:B.apByRank[0],rank:0,
+  budget:30000,rep:20,books:800,tidy:100,morale:100,
+  unknown:0,cards:[],staff:[],rooms:[],treasures:[],
+  quest:null, assigned:{}, usedRefs:[],
+  rec:{shelved:0,misses:0,refTook:0,refSolved:0,selected:0,repaired:0,talks:0,rests:0,
+       events:0,pops:0,markets:0,delegated:0,recovered:0,visitorsBySeason:[],lendBySeason:[],newUsers:0},
+  yearly:[], firstFloor:null
+}}
+
+/* ══════════ 画面切替 ══════════ */
+const V=["vTitle","vBrief","vTurn","vShelve","vRef","vFlash","vAudit","vDuel","vReport","vBuild","vEnd"];
+function show(id){V.forEach(v=>document.getElementById(v).hidden=(v!==id));window.scrollTo({top:0,behavior:"instant"})}
+function el(id){return document.getElementById(id)}
+function fmt(n){return n.toLocaleString("ja-JP")}
+
+function paintStatus(){
+  el("status").hidden=false;
+  el("sWhen").textContent=`${S.year}年目・${SEASONS[S.season]}`;
+  el("sRank").textContent=RANKS[S.rank];
+  el("sAp").innerHTML=Array.from({length:B.apByRank[S.rank]},(_,i)=>`<i class="${i<S.ap?"":"off"}"></i>`).join("");
+  el("sBudget").textContent=fmt(S.budget);
+  el("sRep").textContent=S.rep;
+  el("sBooks").textContent=fmt(S.books);
+  el("sTidy").textContent=Math.max(0,Math.round(S.tidy));
+  el("sUnk").textContent=S.unknown;
+}
+
+/* ══════════ 開始 ══════════ */
+function startGame(){S=newState();paintStatus();brief()}
+
+/* ── 年度はじめの課題予告 ── */
+const QUESTS=[
+ {id:"speed",n:"配架の速さ",d:"棚に戻した冊数と、整理度で見るぞ",tip:"「配架」を多めに"},
+ {id:"child",n:"児童サービス",d:"お話し会の回数と、子どもの相談の解決率だ",tip:"「お話し会」と児童コーナー"},
+ {id:"ref",  n:"レファレンス",d:"相談の解決件数と、集めた難問の質を見る",tip:"「カウンターに立つ」を多めに"}
+];
+const OPENING=[
+ {h:"辞令",b:`まちなか図書館。職員は館長ひとりと、今日から加わるあなた。<br>
+   建物は二階建てだが、いま使えているのは<b>一階の一部屋だけ</b>。残りは書類上「準備中」のまま、何年も止まっている。<br>
+   前任の司書は先月、本館へ異動していった。引き継ぎの紙は一枚だけだった。`,
+  say:"新人が来ると聞いて期待はしとらん。まずは棚を覚えなさい。",who:"鴫原館長"},
+ {h:"二年目の春",b:`名札の肩書きが変わった。<br>
+   使えるエリアが増え、去年までは触れなかった仕事が回ってくるようになった。`,
+  say:"去年よりは仕事らしくなってきたな。だが、まだ足りん。",who:"鴫原館長"},
+ {h:"三年目の春",b:`主任になった。判断を仰がれる側に回った。<br>
+   この図書館をどこまで広げられるか——決めるのは、もうあなたに近い。`,
+  say:"……好きにやってみなさい。今年で最後だ。",who:"鴫原館長"}
+];
+function brief(){
+  const op=OPENING[S.year-1];
+  S.quest=QUESTS[(S.year-1)%QUESTS.length];
+  el("vBrief").innerHTML=`
+   <div class="eyebrow">${S.year}年目・春 — 年度はじめ</div>
+   <h1 style="font-size:28px;margin:6px 0 14px">${op.h}</h1>
+   <div class="panel stack">
+     <p style="margin:0;font-family:'Shippori Mincho',serif;font-size:16.5px;line-height:1.9">${op.b}</p>
+     <div class="quote"><div class="who">${op.who}</div><p>「${op.say}」</p></div>
+     <hr class="rule">
+     <div>
+       <div class="eyebrow">事務連絡　—　${S.year}年度の重点目標</div>
+       <p style="margin:6px 0 0"><b>${S.quest.n}</b>。${S.quest.d.replace(/だぞ$|だ$/,"")}<br>
+       <span class="note">年度末の評価で、ここを見られます。目安は「${S.quest.tip}」。</span></p>
+     </div>
+     <p class="muted" style="margin:0">この一年は${SEASONS.join("・")}の4ターン。行動を選べる回数は毎ターン
+       <b class="mono">${B.apByRank[S.rank]}</b>。冬には蔵書点検があります。</p>
+     ${S.staff.length?`<p class="note">部下：${S.staff.map(s=>s.n).join("・")}　—　ターン開始時に業務を任せられます。</p>`:""}
+     <div class="row"><button class="btn" onclick="turn()">${SEASONS[0]}を始める</button></div>
+   </div>`;
+  show("vBrief");paintStatus();
+}
+
+/* ══════════ ターン ══════════ */
+const ACTIONS=[
+ {id:"shelve",n:"配架する",ap:1,rank:0,game:true,d:"返却台の本を棚に戻す。整理度が上がる"},
+ {id:"counter",n:"カウンターに立つ",ap:2,rank:0,game:true,d:"相談に応じる。評判と難問カード"},
+ {id:"repair",n:"本を修繕する",ap:1,rank:0,d:"傷んだ本を直す。蔵書の目減りを防ぐ"},
+ {id:"talk",n:"常連と話す",ap:1,rank:0,d:"友好度が上がる。寄贈や聞き返しの回数に効く"},
+ {id:"rest",n:"休む",ap:1,rank:0,d:"やる気が戻る。何も進まない"},
+ {id:"select",n:"選書する",ap:1,rank:1,d:"新しい本を仕入れる。蔵書が増える"},
+ {id:"pop",n:"POPを作る",ap:1,rank:1,d:"来館者が増える"},
+ {id:"market",n:"古書市へ出かける",ap:2,rank:2,d:"掘り出し物を探しに行く"},
+ {id:"story",n:"お話し会をひらく",ap:2,rank:2,d:"子どもの常連が増える"},
+ {id:"paper",n:"書類を書く",ap:1,rank:2,d:"次の勝負を有利にする。やる気は減る"}
+];
+let turnLog=[];
+function turn(){
+  const avail=ACTIONS.filter(a=>a.rank<=S.rank);
+  const canDelegate=S.staff.filter(s=>!S.assigned[s.id]);
+  el("vTurn").innerHTML=`
+   <div class="eyebrow">${S.year}年目・${SEASONS[S.season]}　—　今年の課題：${S.quest.n}</div>
+   <h1 style="font-size:26px;margin:6px 0 4px">今日、何をしますか</h1>
+   <p class="muted" style="margin:0 0 16px">残り行動力 <b class="mono">${S.ap}</b> / ${B.apByRank[S.rank]}　　やる気 <b class="mono">${Math.max(0,Math.round(S.morale))}</b></p>
+   ${S.staff.length?`<div class="panel" style="margin-bottom:14px">
+      <div class="eyebrow">部下に任せる</div>
+      <div class="row" style="margin-top:8px">
+        ${S.staff.map(s=>`<button class="btn ghost" ${S.assigned[s.id]?"disabled":""} onclick="delegate('${s.id}')">
+          ${s.n}に「${s.job}」を任せる${S.assigned[s.id]?"（済）":""}</button>`).join("")}
+      </div>
+      <p class="note" style="margin:8px 0 0">任せると行動力を使わずに処理されます。ただし出来はその人次第。</p>
+    </div>`:""}
+   <div class="acts">
+     ${avail.map(a=>`<button class="act ${a.game?"game":""}" ${S.ap<a.ap?"disabled":""} onclick="doAct('${a.id}')">
+        <span class="n">${a.n}<span class="cost">AP ${a.ap}</span></span>
+        <span class="d">${a.d}</span>
+        ${a.game?'<span class="tag">MINI GAME</span>':""}
+      </button>`).join("")}
+   </div>
+   ${turnLog.length?`<div class="panel" style="margin-top:16px"><div class="eyebrow">この季節の記録</div>
+      <div class="log" style="margin-top:8px">${turnLog.map(l=>`<span>${l}</span>`).join("")}</div></div>`:""}
+   <div class="row" style="margin-top:18px">
+     <button class="btn ghost" onclick="endTurn()">この季節を終える${S.ap>0?`（行動力が ${S.ap} 残っています）`:""}</button>
+   </div>`;
+  show("vTurn");paintStatus();
+}
+function delegate(id){
+  const s=S.staff.find(x=>x.id===id);S.assigned[id]=true;S.rec.delegated++;
+  if(s.id==="shinomiya"){
+    const n=6+Math.floor(Math.random()*4);S.rec.shelved+=n;S.tidy=Math.min(100,S.tidy+7);
+    const miss=Math.random()<.6?1+Math.floor(Math.random()*2):0;S.unknown+=miss;
+    turnLog.push(`<b>四宮</b>が配架。${n}冊を戻した${miss?`。ただし不明本が ${miss}冊 出た`:""}`);
+  }else{
+    S.rec.refTook++;S.rec.refSolved++;S.rep+=3;
+    turnLog.push(`<b>堂前</b>がレファレンス。1件を確実に解決（件数は伸びない）`);
+  }
+  turn();
+}
+function doAct(id){
+  const a=ACTIONS.find(x=>x.id===id);
+  if(S.ap<a.ap)return;
+  S.ap-=a.ap;
+  if(id==="shelve")return shelveStart();
+  if(id==="counter")return refStart();
+  let msg="";
+  switch(id){
+    case "repair": S.books+=3;S.rec.repaired++;msg="傷んだ本を3冊直した。棚から消える本が減る。";break;
+    case "talk": S.rec.talks++;S.rep+=2;if(Math.random()<.45){S.books+=5;msg="たまきさんが本を5冊寄贈してくれた。";}
+      else msg="常連と話し込んだ。次の勝負で聞き返せる回数が増えた。";break;
+    case "rest": S.morale=Math.min(100,S.morale+B.moraleRest);S.rec.rests++;msg="今日は早く帰った。やる気が戻った。";break;
+    case "select": {const c=8000;if(S.budget<c){S.ap+=a.ap;alert("予算が足りません");return turn();}
+      S.budget-=c;S.books+=40;S.rec.selected+=40;msg="新刊を40冊入れた。ジャンルの穴がひとつ埋まった。";break;}
+    case "pop": S.rep+=4;S.morale-=8;S.rec.pops++;msg="手書きのPOPを立てた。「なんとなく借りていく人」が増えた。";break;
+    case "market": S.budget-=5000;S.rec.markets++;S.morale-=10;
+      if(Math.random()<.5&&S.cards.length<8){const r=pickRef(3);if(r){S.cards.push(r);msg="古書市で掘り出し物。<b>難問カードを1枚</b>手に入れた。";}else msg="古書市を歩いた。今日はめぼしいものがない。";}
+      else msg="古書市を歩いた。今日はめぼしいものがない。";break;
+    case "story": S.rep+=7;S.morale-=B.moraleEvent;S.rec.events++;msg="お話し会。子どもが7人来て、3人が親を連れてまた来ると言った。";break;
+    case "paper": S.morale-=16;S.rec.paperwork=(S.rec.paperwork||0)+1;msg="書類を書いた。次の勝負で相手の基準が少し下がる。";break;
+  }
+  turnLog.push(msg);
+  if(S.ap<=0)endTurn();else turn();
+}
+function endTurn(){
+  S.tidy=Math.max(0,S.tidy+B.tidyDecayPerTurn);
+  const visitors=Math.round(40+S.rep*2.2+S.rooms.length*12+Math.random()*20);
+  const lends=Math.round(visitors*0.55+S.books*0.01);
+  S.rec.visitorsBySeason.push(visitors);S.rec.lendBySeason.push(lends);
+  S.rec.newUsers+=Math.round(visitors*0.06);
+  const grant=S.rep*B.grantPerRep;S.budget+=grant;
+  if(!S.firstFloor)S.firstFloor=[...S.rooms];
+  const nextIsWinter=(S.season===3);
+  el("vFlash").innerHTML=`
+    <div class="eyebrow">${S.year}年目・${SEASONS[S.season]}　しめくくり</div>
+    <h1 style="font-size:24px;margin:6px 0 14px">${SEASONS[S.season]}が終わった</h1>
+    <div class="panel stack">
+      <div class="figs">
+        <div class="fig"><span class="k">来館者</span><span class="v">${fmt(visitors)}<small>人</small></span></div>
+        <div class="fig"><span class="k">貸出</span><span class="v">${fmt(lends)}<small>冊</small></span></div>
+        <div class="fig"><span class="k">交付金</span><span class="v">${fmt(grant)}<small>円</small></span></div>
+        <div class="fig"><span class="k">整理度</span><span class="v">${Math.round(S.tidy)}</span></div>
+      </div>
+      ${turnLog.length?`<div class="log">${turnLog.map(l=>`<span>${l}</span>`).join("")}</div>`:""}
+      <div class="row">
+        <button class="btn ghost" onclick="buildScreen()">間取りを見る・部屋を建てる</button>
+        <button class="btn" onclick="afterFlash()">${nextIsWinter?"年度末へ":"次の季節へ"}</button>
+      </div>
+    </div>`;
+  turnLog=[];show("vFlash");paintStatus();
+}
+function afterFlash(){
+  if(S.season===3){return auditStart();}
+  S.season++;S.ap=B.apByRank[S.rank];S.assigned={};turn();
+}
+
+/* ══════════ 建設 ══════════ */
+function planSVG(){
+  const W=640,H=470,pad=14;
+  const cols=4,rows=3,gx=8,gy=8;
+  const x0=pad+10,y0=pad+10,w=(W-pad*2-20-gx*(cols-1))/cols,h=(H-136-pad*2-gy*(rows-1))/rows;
+  let g="";
+  for(let i=0;i<12;i++){
+    const c=i%cols,r=Math.floor(i/cols);
+    const x=x0+c*(w+gx),y=y0+r*(h+gy);
+    let name,state;
+    if(i===0){name="一般書架";state="built"}
+    else{
+      const rid=S.rooms[i-1];
+      if(rid){name=ROOMS.find(z=>z.id===rid).n;state="built"}
+      else if(i-1<(S.rank+1)*3){name="空き";state="empty"}
+      else{name="未解禁";state="locked"}
+    }
+    const fill = state==="built"?"var(--ai-soft)":"transparent";
+    const stroke = state==="built"?"var(--ai)":"var(--line)";
+    const dash = state==="built"?"":'stroke-dasharray="5 4"';
+    const op = state==="locked"?'opacity="0.32"':"";
+    g+=`<g ${op}><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${fill}" stroke="${stroke}" stroke-width="${state==="built"?1.5:1}" ${dash}/>
+      <text x="${x+w/2}" y="${y+h/2+4}" text-anchor="middle" font-size="13"
+        fill="${state==="built"?"var(--ink)":"var(--ink-3)"}"
+        font-family="Zen Kaku Gothic New, sans-serif">${name}</text></g>`;
+  }
+  const cy=H-100;
+  return `<svg class="plan" viewBox="0 0 ${W} ${H}" role="img" aria-label="図書館の館内図">
+    <rect x="${pad}" y="${pad}" width="${W-pad*2}" height="${H-pad*2}" fill="none" stroke="var(--ink-3)" stroke-width="3"/>
+    <rect x="${x0}" y="${cy}" width="${W-pad*2-20}" height="34" rx="2" fill="var(--panel-2)" stroke="var(--line)"/>
+    <text x="${x0+14}" y="${cy+22}" font-size="13" fill="var(--ink-2)" font-family="Zen Kaku Gothic New, sans-serif">カウンター・返却台</text>
+    <rect x="${W/2-46}" y="${H-pad-3}" width="92" height="6" fill="var(--panel)"/>
+    <path d="M${W/2} ${H-pad-46} v26 M${W/2-7} ${H-pad-27} l7 7 7-7" fill="none" stroke="var(--ink-3)" stroke-width="1.6"/>
+    <text x="${W/2+16}" y="${H-pad-32}" font-size="12" fill="var(--ink-3)" font-family="Roboto Mono, monospace">入口</text>
+    ${g}
+  </svg>`;
+}
+function buildScreen(){
+  const buildable=ROOMS.filter(r=>r.rank<=S.rank&&!S.rooms.includes(r.id)&&r.id!=="rare");
+  el("vBuild").innerHTML=`
+    <div class="eyebrow">館内図　—　${RANKS[S.rank]}が使える範囲</div>
+    <h1 style="font-size:24px;margin:6px 0 14px">図書館のいま</h1>
+    <div class="panel stack">
+      ${planSVG()}
+      <p class="note">実線が建った部屋、破線が空き。うすい枠はまだ解禁されていないエリアで、下剋上に勝つと広がります。</p>
+      <hr class="rule">
+      <div class="eyebrow">建てられるもの　（予算 ${fmt(S.budget)}円）</div>
+      <div class="acts">
+        ${buildable.length?buildable.map(r=>`<button class="act" ${S.budget<r.c||S.rooms.length>=(S.rank+1)*3?"disabled":""} onclick="build('${r.id}')">
+          <span class="n">${r.n}<span class="cost">${fmt(r.c)}円</span></span><span class="d">${r.d}</span></button>`).join("")
+        :`<p class="muted">いま建てられるものはありません。</p>`}
+      </div>
+      <div class="row"><button class="btn" onclick="show('vFlash')">戻る</button></div>
+    </div>`;
+  show("vBuild");
+}
+function build(id){
+  const r=ROOMS.find(x=>x.id===id);
+  if(S.budget<r.c)return;
+  S.budget-=r.c;S.rooms.push(id);paintStatus();buildScreen();
+}
+
+/* ══════════ 配架ミニゲーム ══════════ */
+const KANA=["ア","イ","ウ","エ","オ","カ","キ","ク","ケ","コ","サ","シ","ス","セ","ソ","タ","チ","ツ","テ","ト",
+            "ナ","ニ","ヌ","ネ","ノ","ハ","ヒ","フ","ヘ","ホ","マ","ミ","ム","メ","モ","ヤ","ユ","ヨ","ラ","リ","ル","レ","ロ","ワ"];
+const TPOOL=["走れメロス","銀河鉄道の夜","吾輩は猫である","山椒魚","蜘蛛の糸","注文の多い料理店","こころ","坊っちゃん",
+ "トロッコ","羅生門","檸檬","高瀬舟","たけくらべ","伊豆の踊子","風立ちぬ","銀の匙","舞姫","野菊の墓","小僧の神様","杜子春",
+ "河童","三四郎","門","こゝろ抄","春と修羅","智恵子抄","一握の砂","みだれ髪","おくのほそ道","南総里見八犬伝"];
+const BCOLOR=["#4a5f7a","#7a4a4a","#46654f","#6b5a3a","#5a4a6b","#3f6b6b","#7a6b4a","#5f4a5a","#3f5a6b","#6b4a3f"];
+const RACKS=[
+ {lab:"910.0 ─ 911.9",lo:9100,hi:9119},
+ {lab:"912.0 ─ 913.5",lo:9120,hi:9135},
+ {lab:"913.6　ア─ソ",lo:9136,hi:9136,kf:0,kt:14},
+ {lab:"913.6　タ─ワ",lo:9136,hi:9136,kf:15,kt:99},
+ {lab:"914.0 ─ 916.9",lo:9140,hi:9169},
+ {lab:"917.0 ─ 919.9",lo:9170,hi:9199},
+ {lab:"920.0 ─ 924.9",lo:9200,hi:9249},
+ {lab:"925.0 ─ 929.9",lo:9250,hi:9299},
+ {lab:"930.0 ─ 933.9",lo:9300,hi:9339}
+];
+function inRack(r,b){
+  const ki=KANA.indexOf(b.kana);
+  return b.cn>=r.lo&&b.cn<=r.hi&&(r.kf===undefined||(ki>=r.kf&&ki<=r.kt));
+}
+function cnText(v){return (v/10).toFixed(1).padStart(5,"0")}
+function sortKey(b){return b.cn*100+KANA.indexOf(b.kana)}
+
+let SH=null;
+function shelveStart(){
+  SH={i:0,ok:0,near:0,bad:0,t:B.shelveTime+(S.rooms.includes("sign")?8:0),timer:null,total:B.shelveBooks,step:"rack"};
+  makeRound();
+  SH.timer=setInterval(()=>{SH.t--;if(SH.t<=0){clearInterval(SH.timer);shelveEnd()}else paintShelve()},1000);
+  paintShelve();show("vShelve");
+}
+function randBook(r,ti){
+  const cn = r.lo===r.hi ? r.lo : r.lo+Math.floor(Math.random()*(r.hi-r.lo+1));
+  const kf=r.kf===undefined?0:r.kf, kt=Math.min(r.kt===undefined?KANA.length-1:r.kt,KANA.length-1);
+  const kana=KANA[kf+Math.floor(Math.random()*(kt-kf+1))];
+  return {cn,kana,t:TPOOL[ti%TPOOL.length],c:BCOLOR[ti%BCOLOR.length]};
+}
+function makeRound(){
+  // 隣り合う2棚だけを見せる（見やすさ優先）
+  const j=Math.floor(Math.random()*(RACKS.length-1));
+  const pair=[RACKS[j],RACKS[j+1]];
+  let ti=Math.floor(Math.random()*TPOOL.length);
+  SH.tiers=pair.map(rack=>{
+    const n=(window.innerWidth<640?4:5),books=[],used=new Set();
+    while(books.length<n){
+      const b=randBook(rack,ti++);const k=b.cn+"/"+b.kana;
+      if(used.has(k))continue;used.add(k);books.push(b);
+    }
+    books.sort((a,b)=>sortKey(a)-sortKey(b));
+    return {rack,books,used};
+  });
+  SH.tierIdx=Math.random()<.5?0:1;
+  const tier=SH.tiers[SH.tierIdx];
+  let tg;
+  do{tg=randBook(tier.rack,ti++)}while(tier.used.has(tg.cn+"/"+tg.kana));
+  tg.t=TPOOL[Math.floor(Math.random()*TPOOL.length)];
+  SH.target=tg;
+  const pos=tier.books.findIndex(b=>sortKey(b)>sortKey(tg));
+  SH.slotIdx = pos<0 ? tier.books.length : pos;
+}
+function bookHTML(b,extra=""){
+  return `<span class="bk" style="--bc:${b.c};${extra}"><span class="ttl"><span>${b.t.slice(0,7)}</span></span>
+    <span class="lab">${cnText(b.cn)}<br>${b.kana}</span></span>`;
+}
+function paintShelve(){
+  if(!SH||!SH.target)return;
+  const tg=SH.target;
+  const body=`<div class="case">${SH.tiers.map((tr,ti)=>{
+      let h=`<div class="tier"><span class="rng">${tr.rack.lab.replace("　","<br>")}</span>`;
+      h+=`<button class="slot" onclick="drop(${ti},0)" aria-label="ここに差す"></button>`;
+      tr.books.forEach((b,i)=>{h+=bookHTML(b)+`<button class="slot" onclick="drop(${ti},${i+1})" aria-label="ここに差す"></button>`});
+      return h+`</div>`}).join("")}</div>
+    <p class="case-hint">左が棚の受け持ち範囲。棚の中は<b>請求記号の小さい順</b>、同じ数字なら<b>著者記号の五十音順</b>。差す隙間をクリック。</p>`;
+  el("vShelve").innerHTML=`
+    <div class="eyebrow">配架　—　棚に戻す</div>
+    <div class="row" style="justify-content:space-between;margin:6px 0 10px">
+      <h1 style="font-size:24px">この本を、正しい場所へ</h1>
+      <span class="timer mono">残り ${SH.t}秒</span>
+    </div>
+    <div class="bar" style="margin-bottom:14px"><i style="width:${SH.t/B.shelveTime*100}%"></i></div>
+    <div class="panel stack">
+      <div class="row" style="gap:16px;align-items:center">
+        <span class="label-card"><span class="a">${cnText(tg.cn)}</span><span class="b">${tg.kana}</span></span>
+        <div>
+          <div class="eyebrow">${SH.i+1} / ${SH.total} 冊目　—　返却台の本</div>
+          <div style="font-family:'Shippori Mincho',serif;font-size:19px">『${tg.t}』</div>
+        </div>
+      </div>
+      ${body}
+      <div class="note">正確 ${SH.ok}　／　惜しい ${SH.near}　／　不明本 ${SH.bad}</div>
+    </div>`;
+}
+function drop(ti,si){
+  if(ti!==SH.tierIdx){SH.bad++;S.unknown++;SH.t=Math.max(1,SH.t-3)}
+  else if(si===SH.slotIdx)SH.ok++;
+  else{SH.near++;SH.t=Math.max(1,SH.t-4)}
+  nextBook();
+}
+function nextBook(){
+  SH.i++;
+  if(SH.i>=SH.total){clearInterval(SH.timer);return shelveEnd()}
+  makeRound();paintShelve();
+}
+function shelveEnd(){
+  const got=SH.ok+SH.near;
+  S.rec.shelved+=got*2;S.rec.misses+=SH.bad;
+  S.tidy=Math.min(100,S.tidy+B.tidyPerShelve*(got/B.shelveBooks)+SH.ok*2);
+  const t=`<b>配架</b>　正確 ${SH.ok}／惜しい ${SH.near}／不明本 ${SH.bad}`;
+  turnLog.push(t);SH=null;
+  if(S.ap<=0)endTurn();else turn();
+}
+
+/* ══════════ レファレンス ══════════ */
+let RF=null;
+function pickRef(minLv){
+  const c=REFS.filter(r=>!S.usedRefs.includes(r.say)&&(minLv?r.lv>=minLv:true));
+  if(!c.length)return null;
+  return c[Math.floor(Math.random()*c.length)];
+}
+function refStart(){
+  const list=[];
+  for(let i=0;i<B.refPerCounter;i++){
+    let r=pickRef(S.year>=3?2:0)||pickRef(0);
+    if(!r)break;
+    S.usedRefs.push(r.say);list.push(r);
+  }
+  if(!list.length){turnLog.push("今日は相談が来なかった。");return S.ap<=0?endTurn():turn()}
+  RF={list,i:0,asked:false,solved:0,cards:0,shown:null};
+  paintRef();show("vRef");
+}
+function paintRef(){
+  const r=RF.list[RF.i];
+  const res=RF.shown;
+  el("vRef").innerHTML=`
+    <div class="eyebrow">レファレンス　—　カウンター　（${RF.i+1} / ${RF.list.length} 件目）</div>
+    <h1 style="font-size:24px;margin:6px 0 6px">${res?(res.ok?"見つかりました":"見つけられなかった"):"相談が来ました"}</h1>
+    <p class="muted" style="margin:0 0 14px">今日ここまで　解決 <b class="mono">${RF.solved}</b> 件</p>
+    <div class="panel stack">
+      <div class="quote"><div class="who">${r.who}</div><p>「${r.say}」</p></div>
+      ${RF.asked?`<div class="panel" style="background:var(--ai-soft);border-color:var(--ai)">
+         <div class="eyebrow">聞き返した</div><p style="margin:4px 0 0">${r.hint}</p></div>`:
+       (res?"":`<div class="row"><button class="btn ghost" onclick="askBack()">もう少し聞いてみる</button>
+         <span class="note">聞き返すと手がかりが増えます。引っかけを見抜けるのはこの一手だけ。</span></div>`)}
+      ${res?`
+        <table><tr><th>正解</th><td>『${r.ans}』</td></tr>
+        <tr><th>あなたの答え</th><td>『${res.c}』</td></tr>
+        <tr><th>覚え違いの型</th><td>${r.kata}${r.trick?"　＋　<b>引っかけ</b>":""}</td></tr></table>
+        ${res.ok?`<p class="muted">評判が上がった。${res.card?"この相談は<b>難問カード</b>になり、年度末の勝負で使える。":""}</p>`
+                :`<p class="muted">${r.trick&&!RF.asked?"聞き返していれば、思い込みに気づけたかもしれない。":"惜しかった。"}</p>`}
+        <div class="row"><button class="btn" onclick="refNext()">${RF.i+1<RF.list.length?"次の相談へ":"カウンターを離れる"}</button></div>`
+      :`<div class="choices">${choiceHTML(r,"answer")}</div>`}
+    </div>`;
+}
+function choiceHTML(r,fn){
+  return r.ch.map((c,i)=>`<button class="choice bkchoice" onclick="${fn}(${i})">
+    <span class="sw" style="background:${COL[c[2]]}"></span>
+    <span><span class="ti">『${c[0]}』</span><span class="au">${c[1]}</span></span>
+    <span class="cn">表紙：${c[2]}</span></button>`).join("");
+}
+function askBack(){RF.asked=true;paintRef()}
+function answer(idx){
+  const r=RF.list[RF.i],c=r.ch[idx][0],ok=(c===r.ans);
+  S.rec.refTook++;
+  let card=false;
+  if(ok){
+    RF.solved++;S.rec.refSolved++;S.rep+=B.refRepWin+(S.rooms.includes("av")?2:0);
+    if(r.lv>=2&&S.cards.length<8){S.cards.push(r);card=true;RF.cards++}
+  }else{S.rep=Math.max(0,S.rep+B.refRepLose)}
+  RF.shown={ok,c,card};
+  paintRef();paintStatus();
+}
+function refNext(){
+  if(RF.i+1<RF.list.length){RF.i++;RF.asked=false;RF.shown=null;return paintRef()}
+  S.morale=Math.max(0,S.morale+B.moraleCounter);
+  turnLog.push(`<b>カウンター</b>　${RF.list.length}件を受け、${RF.solved}件を解決${RF.cards?`。難問カード ${RF.cards}枚`:""}`);
+  RF=null;if(S.ap<=0)endTurn();else turn();
+}
+
+/* ══════════ 蔵書点検 ══════════ */
+let AU=null;
+function auditStart(){
+  const shelves=NDC.map(x=>({...x,
+    last:SEASONS[Math.floor(Math.random()*4)],
+    risk:Math.random()
+  }));
+  const total=Math.max(2,S.unknown+Math.round((100-S.tidy)/12));
+  shelves.sort(()=>Math.random()-.5);
+  let left=total;
+  shelves.forEach((s,i)=>{const v=(i<3)?Math.ceil(left*0.45):Math.floor(Math.random()*2);s.hidden=Math.min(left,v);left-=s.hidden});
+  AU={shelves,picked:[],phase:"pick",found:0,total,
+      picks:B.auditPick+(S.rooms.includes("sign")?1:0)+(S.rooms.includes("stack")?1:0)};
+  paintAudit();show("vAudit");
+}
+function paintAudit(){
+  if(AU.phase==="pick"){
+    el("vAudit").innerHTML=`
+      <div class="eyebrow">${S.year}年目・冬　—　蔵書点検</div>
+      <h1 style="font-size:26px;margin:6px 0 6px">どの棚を見ますか</h1>
+      <p class="muted" style="margin:0 0 14px">全部は見きれません。<b>${AU.picks}棚</b>まで。
+        この一年、どこをサボったかを思い出してください。不明本は全部で <b class="mono">${AU.total}</b> 冊。</p>
+      <div class="panel stack">
+        <div class="shelves">
+          ${AU.shelves.map((s,i)=>`<button class="shelf ${AU.picked.includes(i)?"sel":""}" style="--sc:var(--ndc${s.n})" onclick="pickAudit(${i})">
+            <span class="no">${s.n}00</span><span class="nm">${s.t}</span>
+            <span class="nm mono" style="margin-top:3px">最後の配架：${s.last}</span></button>`).join("")}
+        </div>
+        <p class="note">選んだ棚：<b>${AU.picked.length} / ${AU.picks}</b>${AU.picked.length?`　—　${AU.picked.map(i=>AU.shelves[i].n+"00 "+AU.shelves[i].t).join("・")}　（もう一度押すと外せます）`:""}</p>
+        <div class="row"><button class="btn" ${AU.picked.length?"":"disabled"} onclick="auditGo()">点検を始める</button></div>
+      </div>`;
+  }else{
+    const i=AU.picked[AU.cur];
+    const s=AU.shelves[i];
+    const left=s.row.filter(b=>b.odd&&!b.done).length;
+    const row=`<div class="case"><div class="tier"><span class="rng" style="color:var(--ndc${s.n})">${s.n}00<br>${s.t}</span>
+        ${s.row.map((b,j)=>`<button class="bk ${b.odd?"odd":""} ${b.done&&b.odd?"hit":""}" ${b.done?"disabled":""}
+          style="--bc:${b.c}" onclick="grab(${i},${j})">
+          <span class="ttl"><span>${b.t.slice(0,6)}</span></span>
+          <span class="lab">${b.lab}<br>${b.kana}</span></button>`).join("")}</div></div>`;
+    el("vAudit").innerHTML=`
+      <div class="eyebrow">${S.year}年目・冬　—　蔵書点検　（${AU.cur+1} / ${AU.picked.length} 棚目）</div>
+      <div class="row" style="justify-content:space-between;margin:6px 0 10px">
+        <h1 style="font-size:24px">${s.n}00 ${s.t}　の棚</h1><span class="timer mono">残り ${AU.t}秒</span>
+      </div>
+      <div class="bar" style="margin-bottom:14px"><i style="width:${AU.t/B.auditTime*100}%"></i></div>
+      <div class="panel stack">
+        <p class="muted" style="margin:0">請求記号が<b>左から昇順</b>に並んでいるはずです。順番の狂っている本をクリック。</p>
+        ${row}
+        <div class="row" style="justify-content:space-between">
+          <span class="note">回収 <b>${AU.found}</b> 冊　（今年の不明本 ${AU.total}冊）　空振りは3秒のロス</span>
+          <button class="btn ghost" onclick="nextRack()">${AU.cur+1<AU.picked.length?"次の棚へ":"点検を終える"}</button>
+        </div>
+        ${left===0?`<p class="note" style="color:var(--ok)">この棚はもう乱れていません。</p>`:""}
+      </div>`;
+  }
+}
+function pickAudit(i){
+  const at=AU.picked.indexOf(i);
+  if(at>=0){AU.picked.splice(at,1);return paintAudit()}
+  if(AU.picked.length>=AU.picks)return;
+  AU.picked.push(i);paintAudit();
+}
+function nextRack(){
+  if(AU.cur+1<AU.picked.length){AU.cur++;return paintAudit()}
+  clearInterval(AU.timer);auditEnd();
+}
+function auditGo(){
+  AU.phase="run";AU.t=B.auditTime;AU.cur=0;
+  AU.picked.forEach(i=>{
+    const s=AU.shelves[i];const n=(window.innerWidth<640?4:6);
+    let v=s.n*1000+Math.floor(Math.random()*120);
+    const row=Array.from({length:n},(_,k)=>{
+      v+=12+Math.floor(Math.random()*46);
+      return {lab:cnText(v),kana:KANA[(k*5+s.n)%KANA.length],
+              t:TPOOL[(k+s.n*3)%TPOOL.length],c:BCOLOR[(k+s.n)%BCOLOR.length],odd:false,done:false};
+    });
+    const bad=Math.min(s.hidden,3);
+    const spots=[...Array(n).keys()].sort(()=>Math.random()-.5).slice(0,bad);
+    spots.forEach((p,k)=>{
+      row[p]={lab:cnText(s.n*1000+780+k*57),kana:KANA[(p+7)%KANA.length],
+              t:TPOOL[(p+k+11)%TPOOL.length],c:BCOLOR[(p+4)%BCOLOR.length],odd:true,done:false};
+    });
+    s.row=row;
+  });
+  AU.timer=setInterval(()=>{AU.t--;if(AU.t<=0){clearInterval(AU.timer);auditEnd()}else paintAudit()},1000);
+  paintAudit();
+}
+function grab(i,j){
+  const b=AU.shelves[i].row[j];
+  if(b.done)return;
+  if(b.odd){b.done=true;AU.found++;}
+  else{AU.t=Math.max(1,AU.t-3);}
+  if(AU.found>=AU.total){clearInterval(AU.timer);return auditEnd()}
+  paintAudit();
+}
+function auditEnd(){
+  const rate=AU.total?AU.found/AU.total:1;
+  S.rec.recovered+=AU.found;S.books+=AU.found;S.unknown=Math.max(0,S.unknown-AU.found);
+  S.tidy=Math.min(100,S.tidy+rate*25);
+  let tre=null;
+  if(rate>=0.6){tre=TREASURE[(S.year-1+S.treasures.length)%TREASURE.length];S.treasures.push(tre)}
+  el("vAudit").innerHTML=`
+    <div class="eyebrow">${S.year}年目・冬　—　蔵書点検おわり</div>
+    <h1 style="font-size:26px;margin:6px 0 14px">${rate>=0.6?"棚が、あるべき姿に戻った":"時間切れ。直しきれなかった"}</h1>
+    <div class="panel stack">
+      <div class="figs">
+        <div class="fig"><span class="k">回収</span><span class="v">${AU.found}<small>冊</small></span></div>
+        <div class="fig"><span class="k">不明本</span><span class="v">${AU.total}<small>冊中</small></span></div>
+        <div class="fig"><span class="k">回収率</span><span class="v">${Math.round(rate*100)}<small>%</small></span></div>
+        <div class="fig"><span class="k">整理度</span><span class="v">${Math.round(S.tidy)}</span></div>
+      </div>
+      ${tre?`<div class="quote" style="border-left-color:var(--gold);background:transparent;border:1px solid var(--gold)">
+        <div class="who">棚の奥から出てきたもの</div>
+        <p>${tre.n}</p><p class="muted" style="font-family:inherit;font-size:13.5px;margin-top:6px">${tre.d}</p></div>`
+       :`<p class="muted">直しきれなかった棚には、まだ何かが眠っているかもしれない。</p>`}
+      <div class="row"><button class="btn" onclick="rivalIntro()">年度末の評価へ</button></div>
+    </div>`;
+  AU=null;paintStatus();
+}
+
+/* ══════════ 下剋上 ══════════ */
+let D=null;
+function questScore(){
+  const q=S.quest.id;
+  if(q==="speed")return S.rec.shelved*2+S.tidy*0.4;
+  if(q==="child")return S.rec.events*22+S.rec.refSolved*6+(S.rooms.includes("child")?25:0);
+  return S.rec.refSolved*12+S.cards.length*8;
+}
+const INTRO=[
+ `評価の日。会議室に呼ばれると、見知らぬ相手が先に座っていた。<br>一年上の司書だという。`,
+ `評価の日。今年の相手は、二十年この館にいる人だった。`,
+ `評価の日。館長がひとりで待っていた。ほかに誰もいない。`
+];
+function rivalIntro(){
+  const r=RIVALS[S.year-1];
+  el("vDuel").innerHTML=`
+    <div class="eyebrow">${S.year}年目・冬　—　年度末</div>
+    <h1 style="font-size:28px;margin:6px 0 14px">相手が現れた</h1>
+    <div class="panel stack">
+      <p style="margin:0;font-family:'Shippori Mincho',serif;font-size:16.5px;line-height:1.9">${INTRO[S.year-1]}</p>
+      <div class="quote"><div class="who">${r.n}　${r.r}</div>
+        <p>「${r.says[0]}<br>——今年の重点は<b>${S.quest.n}</b>だったな。カウンターを挟んで、相談を出し合おう。<br>
+        先に${B.duelHp}回しくじった方が負けだ」</p></div>
+      <p class="muted" style="margin:0">この勝負に部下は出せません。手札は、この一年であなたが解決した難問です。<br>
+        いま手札は <b class="mono">${S.cards.length}</b> 枚。</p>
+      <div class="row"><button class="btn" onclick="cutIn()">向かい合う</button></div>
+    </div>`;
+  show("vDuel");
+}
+let cutTimer=null;
+function cutIn(){
+  const r=RIVALS[S.year-1];
+  el("vDuel").innerHTML=`
+    <div class="cutin" onclick="duelStart()">
+      <div class="band"></div>
+      <div class="nm">
+        <div class="role">${r.r}</div>
+        <div class="big">${r.n}</div>
+        <div class="ln">「${r.says[0]}」</div>
+      </div>
+    </div>
+    <p class="note center" style="margin-top:10px">クリックで始まります</p>`;
+  show("vDuel");
+  clearTimeout(cutTimer);
+  cutTimer=setTimeout(()=>{if(!D)duelStart()},2100);
+}
+function duelStart(){
+  clearTimeout(cutTimer);
+  if(D)return;
+  const r=RIVALS[S.year-1];
+  const perf=Math.min(1.4, questScore()/[90,170,240][S.year-1]);
+  D={r,
+     qMe:Math.max(6,Math.round(14-perf*5)),
+     qRival:12, combo:0, best:0, t:90, acc:0, tacc:0,
+     cur:null, asked:false, busy:false, ended:false,
+     hand:S.cards.slice(), sentTotal:0, rivalDone:0,
+     rivalInt: 2300 + Math.round(perf*1200) - (S.year-1)*250};
+  renderDuelShell();
+  nextCustomer();
+  D.timer=setInterval(duelTick,100);
+  show("vDuel");
+}
+function renderDuelShell(){
+  const r=D.r;
+  el("vDuel").innerHTML=`
+   <div class="eyebrow">${S.year}年目・冬　—　下剋上：対 ${r.n}</div>
+   <div class="row" style="justify-content:space-between;margin:6px 0 10px">
+     <h1 style="font-size:24px">カウンターは、二つある</h1>
+     <span class="timer mono" id="dTime">残り ${D.t}秒</span>
+   </div>
+   <div class="bar" style="margin-bottom:14px"><i id="dBar" style="width:100%"></i></div>
+   <div class="vs">
+     <div class="side"><div class="sideh"><b>あなた</b><span class="note" id="dCombo"></span></div>
+       <div class="qrow" id="dQMe"></div></div>
+     <div class="side rival"><div class="sideh"><b>${r.n}</b><span class="note" id="dRStat"></span></div>
+       <div class="qrow" id="dQRi"></div></div>
+   </div>
+   <p class="note" id="dLog" style="min-height:1.7em;margin:10px 0 0">先に行列をさばき切った方が勝ち。</p>
+   <div class="panel stack" id="dProblem" style="margin-top:6px"></div>`;
+  paintQueues();
+}
+function qHTML(n,cls){
+  const cap=Math.min(n,20);
+  return Array.from({length:cap},()=>`<i class="${cls}"></i>`).join("")+(n>20?`<span class="qn mono">+${n-20}</span>`:"");
+}
+function paintQueues(){
+  el("dQMe").innerHTML=qHTML(D.qMe,"")+`<span class="qn mono">${D.qMe}人待ち</span>`;
+  el("dQRi").innerHTML=qHTML(D.qRival,"r")+`<span class="qn mono">${D.qRival}人待ち</span>`;
+  el("dCombo").textContent=D.combo>1?`${D.combo}連続！`:"";
+  el("dRStat").textContent=`さばいた ${D.rivalDone}`;
+}
+function log(m){const e=el("dLog");if(e)e.innerHTML=m}
+function duelTick(){
+  if(!D||D.ended)return;
+  D.acc+=100;D.tacc+=100;
+  if(D.tacc>=1000){D.tacc=0;D.t--;
+    const a=el("dTime"),b=el("dBar");
+    if(a)a.textContent=`残り ${D.t}秒`;
+    if(b)b.style.width=Math.max(0,D.t/90*100)+"%";}
+  if(D.acc>=D.rivalInt){
+    D.acc=0;
+    if(Math.random()<0.12){log(`${D.r.n}が手を止めた。`)}
+    else{
+      D.qRival=Math.max(0,D.qRival-1);D.rivalDone++;
+      if(D.rivalDone%4===0){D.qMe++;log(`${D.r.n}が難しい相談をこちらに回してきた。`)}
+    }
+    paintQueues();
+  }
+  if(D.qMe<=0)return finish(true);
+  if(D.qRival<=0)return finish(false);
+  if(D.t<=0)return finish(D.qMe<=D.qRival);
+}
+function nextCustomer(){
+  D.cur=REFS[Math.floor(Math.random()*REFS.length)];
+  D.asked=false;D.busy=false;paintProblem();
+}
+function paintProblem(){
+  const q=D.cur;
+  el("dProblem").innerHTML=`
+    <div class="quote"><div class="who">${q.who}</div><p>「${q.say}」</p></div>
+    ${D.asked?`<div class="panel" style="background:var(--ai-soft);border-color:var(--ai)">
+      <div class="eyebrow">聞き返した</div><p style="margin:4px 0 0">${q.hint}</p></div>`
+     :`<div class="row">
+        <button class="btn ghost" onclick="dAsk()">聞き返す（2秒ロス）</button>
+        ${D.hand.length?`<button class="btn ghost" onclick="dCard()">難問をぶつける（${D.hand.length}枚）</button>`:""}
+        <span class="note">連続で正解すると、相手の行列に客を送り込めます。</span></div>`}
+    <div class="choices" ${D.busy?'style="opacity:.45;pointer-events:none"':""}>${choiceHTML(q,"dAnswer")}</div>`;
+}
+function dAsk(){if(!D||D.asked||D.busy)return;D.asked=true;D.t=Math.max(1,D.t-2);paintProblem()}
+function dCard(){
+  if(!D||!D.hand.length||D.busy)return;
+  D.hand.shift();D.qRival+=2;D.sentTotal+=2;
+  log("この一年の難問をぶつけた。相手の行列が伸びる。");paintQueues();paintProblem();
+}
+function dAnswer(i){
+  if(!D||D.busy||D.ended)return;
+  const q=D.cur,ok=(q.ch[i][0]===q.ans);
+  if(!ok){
+    D.combo=0;D.qMe++;D.busy=true;
+    log(`『${q.ans}』だった。${q.trick&&!D.asked?"聞き返していれば見抜けた。":""}客が並び直す。`);
+    paintQueues();paintProblem();
+    setTimeout(()=>{if(D&&!D.ended){D.busy=false;nextCustomer()}},1200);
+    return;
+  }
+  D.qMe=Math.max(0,D.qMe-1);D.combo++;D.best=Math.max(D.best,D.combo);
+  let send=0;
+  if(D.combo>=2){send=Math.min(3,D.combo-1)}
+  if(q.trick&&D.asked)send+=2;
+  if(send){D.qRival+=send;D.sentTotal+=send}
+  log(q.trick&&D.asked?`<b>引っかけを見抜いた。</b>相手に ${send}人 送り込み。`
+      :(send?`解決。${D.combo}連続——相手に ${send}人 送り込み。`:"解決。"));
+  paintQueues();
+  if(D.qMe<=0)return finish(true);
+  nextCustomer();
+}
+function finish(win){
+  if(D.ended)return;
+  D.ended=true;clearInterval(D.timer);
+  duelEnd(win);
+}
+function duelEnd(win){
+  const r=D.r;
+  const gained = win?2:1;
+  S.rank=Math.min(3,S.rank+1);
+  if(win){
+    if(S.year===1)S.staff.push({id:"shinomiya",n:"四宮あかね",job:"配架"});
+    if(S.year===2)S.staff.push({id:"domae",n:"堂前主任",job:"レファレンス"});
+  }
+  const yr={year:S.year,win,rival:r.n,
+    visitors:S.rec.visitorsBySeason.slice(-4).reduce((a,b)=>a+b,0),
+    lends:S.rec.lendBySeason.slice(-4).reduce((a,b)=>a+b,0),
+    books:S.books,solved:S.rec.refSolved,shelved:S.rec.shelved,
+    rooms:[...S.rooms],recovered:S.rec.recovered,
+    seasons:S.rec.visitorsBySeason.slice(-4)};
+  S.yearly.push(yr);
+  el("vDuel").innerHTML=`
+    <div class="eyebrow">${S.year}年目・冬　—　決着</div>
+    <h1 style="font-size:28px;margin:6px 0 14px">${win?"勝った":"届かなかった"}</h1>
+    <div class="panel stack">
+      <div class="quote"><div class="who">${r.n}</div><p>「${win?r.says[3]:r.says[2]}」</p></div>
+      <p class="muted">${win
+        ?`<b>${RANKS[S.rank]}</b>に上がった。使える行動が ${gained}つ増え、新しいエリアが開いた。
+          ${S.year<3?`そして——<b>${r.n}が、あなたの部下になった。</b>これから「${r.job}」を任せられる。`:""}`
+        :`それでも階級はひとつ上がった。<b>${RANKS[S.rank]}</b>。開いたのは行動 ${gained}つぶんだけ。`}</p>
+      <div class="row"><button class="btn" onclick="report()">年報を出す</button></div>
+    </div>`;
+  D=null;paintStatus();
+}
+
+/* ══════════ 年報 ══════════ */
+function report(){
+  const y=S.yearly[S.yearly.length-1];
+  const max=Math.max(...y.seasons,1);
+  const w=560,h=150,pad=26;
+  const pts=y.seasons.map((v,i)=>[pad+i*((w-pad*2)/3),h-24-(v/max)*(h-52)]);
+  const path=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  const turnover=(y.lends/Math.max(1,y.books)).toFixed(2);
+  const solveRate=S.rec.refTook?Math.round(S.rec.refSolved/S.rec.refTook*100):0;
+  el("vReport").innerHTML=`
+    <div class="eyebrow">${S.year}年度　図書館年報</div>
+    <div class="report" style="margin-top:8px">
+      <div class="row" style="justify-content:space-between;align-items:flex-start">
+        <div><h2>まちなか図書館　${S.year}年度のあゆみ</h2>
+          <p class="note" style="margin:2px 0 0">館長事務取扱：あなた（${RANKS[S.rank]}）</p></div>
+        <span class="seal">${y.win?"昇任":"留任"}</span>
+      </div>
+      <hr class="rule">
+      <div class="figs">
+        <div class="fig"><span class="k">来館者</span><span class="v">${fmt(y.visitors)}<small>人</small></span></div>
+        <div class="fig"><span class="k">貸出</span><span class="v">${fmt(y.lends)}<small>冊</small></span></div>
+        <div class="fig"><span class="k">蔵書</span><span class="v">${fmt(y.books)}<small>冊</small></span></div>
+        <div class="fig"><span class="k">新規登録</span><span class="v">${fmt(S.rec.newUsers)}<small>人</small></span></div>
+        <div class="fig"><span class="k">レファレンス解決</span><span class="v">${S.rec.refSolved}<small>件</small></span></div>
+        <div class="fig"><span class="k">解決率</span><span class="v">${solveRate}<small>%</small></span></div>
+        <div class="fig"><span class="k">蔵書回転率</span><span class="v">${turnover}</span></div>
+        <div class="fig"><span class="k">配架</span><span class="v">${S.rec.shelved}<small>冊</small></span></div>
+        <div class="fig"><span class="k">点検回収</span><span class="v">${S.rec.recovered}<small>冊</small></span></div>
+        <div class="fig"><span class="k">延床（室数）</span><span class="v">${y.rooms.length+1}<small>室</small></span></div>
+      </div>
+      <hr class="rule">
+      <div class="eyebrow">季節別 来館者</div>
+      <svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="季節別の来館者数">
+        <line x1="${pad}" y1="${h-24}" x2="${w-pad}" y2="${h-24}" stroke="var(--line)" stroke-width="1"/>
+        <path d="${path}" fill="none" stroke="var(--ai)" stroke-width="2"/>
+        ${pts.map((p,i)=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="var(--ai)"/>
+          <text x="${p[0].toFixed(1)}" y="${h-8}" fill="var(--ink-3)" font-size="11" text-anchor="middle" font-family="Roboto Mono, monospace">${SEASONS[i]}</text>
+          <text x="${p[0].toFixed(1)}" y="${(p[1]-10).toFixed(1)}" fill="var(--ink-2)" font-size="11" text-anchor="middle" font-family="Roboto Mono, monospace">${y.seasons[i]}</text>`).join("")}
+      </svg>
+      <hr class="rule">
+      <div class="row" style="align-items:flex-start;gap:26px">
+        <div style="flex:1;min-width:180px">
+          <div class="eyebrow">建てた部屋</div>
+          <ul style="margin:6px 0 0;padding-left:18px">
+            <li>一般書架（開館時から）</li>
+            ${y.rooms.map(r=>`<li>${ROOMS.find(x=>x.id===r).n}</li>`).join("")||"<li class='note'>今年は建てられなかった</li>"}
+          </ul>
+        </div>
+        <div style="flex:1;min-width:180px">
+          <div class="eyebrow">棚から出てきたもの</div>
+          <ul style="margin:6px 0 0;padding-left:18px">
+            ${S.treasures.map(t=>`<li>${t.n}</li>`).join("")||"<li class='note'>今年はなし</li>"}
+          </ul>
+        </div>
+      </div>
+      <hr class="rule">
+      <p class="note">年度末の下剋上：対 ${y.rival}　—　<b>${y.win?"勝利":"敗北"}</b>。${RANKS[S.rank]}として次年度へ。</p>
+    </div>
+    <div class="row" style="margin-top:18px">
+      <button class="btn" onclick="nextYear()">${S.year>=3?"3年間をふりかえる":`${S.year+1}年目へ`}</button>
+    </div>`;
+  show("vReport");
+}
+function nextYear(){
+  if(S.year>=3)return ending();
+  S.year++;S.season=0;S.ap=B.apByRank[S.rank];S.assigned={};
+  S.rec.refSolved=0;S.rec.refTook=0;S.rec.shelved=0;S.rec.events=0;S.rec.paperwork=0;
+  brief();
+}
+
+/* ══════════ 終幕 ══════════ */
+function ending(){
+  const wins=S.yearly.filter(y=>y.win).length;
+  const chief=(S.rank>=3&&wins>=2);
+  el("vEnd").innerHTML=`
+    <div class="eyebrow">3年間のあゆみ</div>
+    <h1 style="font-size:30px;margin:8px 0 6px">${chief?"館長室の鍵を渡された":"次期館長候補"}</h1>
+    <p class="muted" style="margin:0 0 18px">${chief
+      ?"三年前、使えるのは一部屋だけだった。いまは、この階全部があなたのものだ。"
+      :"届かなかった。ただ、この図書館は三年前とはまるで違う顔をしている。"}</p>
+    <div class="panel stack">
+      <div class="figs">
+        ${S.yearly.map(y=>`<div class="fig"><span class="k">${y.year}年目</span>
+          <span class="v">${y.win?"勝":"負"}<small>${y.rival}</small></span></div>`).join("")}
+        <div class="fig"><span class="k">最終の階級</span><span class="v" style="font-size:15px">${RANKS[S.rank]}</span></div>
+        <div class="fig"><span class="k">部屋</span><span class="v">${S.rooms.length+1}<small>室</small></span></div>
+        <div class="fig"><span class="k">蔵書</span><span class="v">${fmt(S.books)}<small>冊</small></span></div>
+      </div>
+      ${S.treasures.length?`<div>
+        <div class="eyebrow">貴重書庫に並んだ本</div>
+        <div class="stack" style="gap:8px;margin-top:8px">
+        ${S.treasures.map(t=>`<div class="quote" style="border-left-color:var(--gold);background:transparent;border:1px solid var(--gold)">
+          <p style="font-size:15px">${t.n}</p>
+          <p class="muted" style="font-family:inherit;font-size:13px;margin-top:4px">${t.d}</p></div>`).join("")}
+        </div></div>`:`<p class="muted">貴重書庫は、空のままだった。蔵書点検をきちんとやれば、何かが出てきたかもしれない。</p>`}
+      <hr class="rule">
+      <div>
+        <div class="eyebrow">試作版として確かめたいこと</div>
+        <ol class="muted" style="margin:8px 0 0;padding-left:20px">
+          <li>部屋が増えるのは、それだけで嬉しかったか</li>
+          <li>配架は5回やっても、6回目をやりたいと思えたか</li>
+          <li>下剋上で「聞き返す」を使うとき、迷いはあったか</li>
+        </ol>
+      </div>
+      <div class="row"><button class="btn" onclick="location.reload()">もう一度、着任する</button></div>
+    </div>`;
+  show("vEnd");
+}
+</script>
